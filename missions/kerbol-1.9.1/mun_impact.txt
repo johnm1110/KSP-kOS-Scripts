@@ -1,0 +1,11 @@
+Mission Plan:	Mun Impact Probe at Specified Location
+
+Requirements:	Launch at specific trajectory to impact Mun surface without orbiting at location.  This reduces the delta-v required but requires a direct trajectory with no room for error.
+
+A:	Initial burn calculation to arrive at Mun.
+B:	Mid course corrections to hit target.
+C:	final approach guidance.
+D:	Ability to maneuver to point of impact.
+
+Trans Munar Injection Trajectory
+Will need to calculate a trajectory in Mun's SOI (Sphere of Influence).  This involves having the trajectory intersect the Mun's surface at the desired impact location.  Since the Mun is tidally locked this position will not rotate so that does not need to be accounted for.  Will need to determine orbital parameters for that orbit, then calculate a TMI trajectory that intercepts the Mun SOI trajectory.

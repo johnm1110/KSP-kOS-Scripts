@@ -1,0 +1,11 @@
+Cruise Phase
+Trajectory Correction Maneuver 1...n
+Approach Phase
+Guided Entry: Cruise stage separation
+Guided Entry: Entry Interface
+Guided Entry: Parachute Deploy
+Guided Entry: Heat Shield Separation
+Guided Entry: 8 km Radar data Collection 
+Powered Descent 1.2 km
+Landing
+entry, descent, landing

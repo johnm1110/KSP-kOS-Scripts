@@ -1,65 +1,7 @@
-	if program = 11 { // Trans Munar Injection (TMI) burn guidance calculations
+	if program = 11 { // wait for Trans Munar Injection (TMI) burn
 		clearscreen.
 		RCS off.
 		
-        // transmunar trajectory up to Mun’s SOI
-			// Choose values for the independent variables of the problem
-				// Select the date for Mun’s position at SOI intercept
-				// Select the value for the arrival angle λ
-				// Select the probe’s radius r0 , right ascension αL , declination δL , and flight path angle γ0 at TMI
-			// Determine Mun’s kerbocentric equatorial state vector (rm ,vm ) on the date at SOI intercept
-			// Calculate s-hat, the unit vector along the Kerbin-to-Mun radial
-			// Calculate ω m , the instantaneous angular velocity of Mun at the time of SOI intercept
-			// Calculatethegeocentricpositionvectorr 0 atTMIusingEqs.(4.4)and(4.5)andthedatainI.1.c
-			//  Calculate ^ w 1 , the unit normal to the plane of the transmunar trajectory
-			//  Calculate ^ b, the unit normal to the plane of ^ s and ^ w 1 . ^ b lies in the plane of the transmunar trajectory (see Fig. 9.10):
-			// 8. Calculate ^ n, the unit vector from the center of Mun to the SOI patch point:
-			// 9. Calculate r 2 , the position vector of the patch point relative to Mun:
-			// 10. Calculate r 1 , the position vector of the patch point relative to the earth:
-			// 11. Use Eq. (9.14) to calculate the sweep angle Δθ:
-			// 12. Calculate the angular momentum h 1 of the transmunar trajectory using Eq. (9.18):
-			// 13. Calculate the Lagrange coefficients f, g, and _ g from Eqs. (9.13a)–(9.13c):
-			// 14. Calculatethevelocityv 0 atTMIandthevelocityv 1 atthepatchpointbymeansofEqs.(9.12a) and (9.12b):
-			// 15. Calculate the radial component of velocity v r 0 at TMI:
-			// 16. Using the TMI state vector (r 0 ,v 0 ), calculate the eccentricity vector e 1 of the transmunar trajectory from Eq. (2.40). The eccentricity, e 1 = ke 1 k, must be less than 1:
-			// 17. Calculatethesemimajoraxisa 1 andtheperiodT 1 ofthetransmunartrajectoryfromEqs.(9.24) and (9.25), respectively:
-			// 18. Calculate the triad of perifocal unit vectors ^ p 1 , ^ q 1 , and ^ w 1 for the transmunar trajectory:
-			// 19. Calculate the true anomaly θ 0 at the TMI point using Eq. (9.27) and noting from Step I.16 that
-			// 20. Calculate the time t 0 since perigee at the TMI point using Eq. (9.28):
-			// 21. Calculate the true anomaly θ 1 at the patch point, θ 1 = θ 0 + Δθ, where we found the sweep angle Δθ in Step I.11:
-			// 22. Calculate the time t 1 since perigee at the patch point using Eq. (9.30):
-			// 23. Calculate the flight time Δt 1 from TMI to the patch point, Δt 1 = t 1 ? t 0 :
-        local radiusInitial is ship:orbit:semimajoraxis.            // radius of LKO (Low Kerbin Orbit) at TMI; r0
-		local radiusFinal is orbitAltitudePlanned + body:radius.    // apoapsis of transfer orbit (Mun orbit); rF
-		
-        local aTransferOrbit is (radiusInitial + radiusFinal) / 2.		// semi-major axis of transfer ellipse
-		
-		local velocityInitial is SQRT(GM * (2 / radiusInitial - 1 / aTransferOrbit)).	// velocity at TMI after the burn, calculate from Hohman transfer veloctiy to Mun orbit
-        
-        local flightPathAngleInitial is 0. // flight path angle (degrees) after TMI (always 0 degrees because it's after the burn)
-        local trajectoryAngleAtMun is 30. // the angle of the transfer trjectory at Mun's SOI (Sphere of Influence)
-
-        // Calculate arrival conditions at Mun SOI; r1, v1, phi1, gamma1
-        local EnergyInitial is (velocityInitial ^ 2 / 2) - (GMKerbin / radiusInitial). // Intial energy of trasnfer trejectory (E0)
-        local angularMomentumInitial is radiusInitial * velocityInitial * cos(flightPathAngleInitial). // Initisl angular momentum of transfer trajectory (h0)
-        
-        local D is target:orbit:altitude + body:radius.
-        local RS is target:soiradius.
-        local radiusSOI is sqrt ( D^2 + RS^2 - (2*D*RS*cos(trajectoryAngleAtMun))). // Radius of the orbit at Mun SOI arrival for given arrival angle (r1)
-        local angularMomentumSOI is angularMomentumInitial. // Angular momentum at Mun SOI arrival; equal to initial angulare momentum due to consrvation of momentum (h1)
-        local velocitySOI is sqrt( 2*(EnergyInitial+(GMKerbin/radiusSOI))). // Velocity at Mun SOI arrival (v1)
-        local flightPathAngleSOI is arccos (angularMomentumSOI/(radiusSOI*velocitySOI)). // Flight path angle at Mun SOI arrival: phi1
-
-        // Calculate Time of Flight (TOF); need p, a, e, E0 and E1 of the trasnfer trajectory
-        local semiLatusRectum is angularMomentumInitial / GMKerbin. // Semi-latus rectum; p
-        local eccentricityTransfer is sqrt ( 1 - semiLatusRectum / aTransferOrbit ).    // Eccentricity, e
-        local phaseAngleSOI is arcsin ( RS/radiusSOI * sin (flightPathAngleSOI)).  // phase angle at SOI
-        local ecentricAnomalyInitial is 0. // Initial Eccentric Anonmaly; EcA0: true anomaly is 0 at periapsis of trasnfer elipse
-        local trueAnomalySOI is arccos((semiLatusRectum-radiusSOI)/(eccentricityTransfer*radiusSOI)). // true anomaly v(p,r,e).
-        local ecentricAnomalySOI is arccos ( (eccentricityTransfer + cos(trueAnomalySOI)) / ( 1 + eccentricityTransfer * cos(trueAnomalySOI))). // Ecentric anomaly at Mun SOI
-        local TOF is sqrt (eccentricityTransfer^3/GMKerbin)*((ecentricAnomalySOI-eccentricityTransfer*sin(ecentricAnomalySOI))-(ecentricAnomalyInitial-eccentricityTransfer*sin(angularMomentumInitial))). // Time of flight; TOF 
-        // Anomaly; 
-
 		set TARGET to targetObject.
 		local aShip is SHIP:ORBIT:SEMIMAJORAXIS.
 		local aTarget is TARGET:ORBIT:SEMIMAJORAXIS - apoapsisTarget + 50000.
