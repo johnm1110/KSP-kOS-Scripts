@@ -80,6 +80,8 @@
 		// the angle to the Mun can not be over 180 degrees, so we need to test if we are movng away
 		// from the Mun and subtract the angle from 360, once we cross 180 degrees the phase angle
 		// will be as calculated.
+		// TODO: create an issue #1
+
 		// TODO: make this better, i.e. use position vector signs to remove need for test
 		// test if we are heading towards the Mun
 		//set distToTarget1 to targetObject:DISTANCE.
