@@ -13,15 +13,19 @@
 
 
 		// determine positions to calculate the current phase angle
+		// get the target position in relation to the ship then transform it to the SOI body
 		lock targetPosition to TARGET:POSITION - SHIP:BODY:POSITION.
 		// KERBIN:POSITION returns the position of Kerbin with respect to the ship, we want the ship's position
 		// with respect to Kerbin so we negate the vector
-		lock kerbinPosition to -KERBIN:position.
+		lock kerbinPosition to -1 * KERBIN:position.
+		// calculate the angle between the two position vectors, this is our current phase angle to the target
 		set currentPhaseAngle to vang(kerbinPosition,targetPosition).
 		
 		// the angle to the Mun can not be over 180 degrees, so we need to test if we are movng away
 		// from the Mun and subtract the angle from 360, once we cross 180 degrees the phase angle
 		// will be as calculated.
+		set checkPhaseAngle to vcrs(kerbinPosition,targetPosition).
+		if checkPhaseAngle:Y < 0 { set currentPhaseAngle to 360 - }
 		// TODO: make this better, i.e. use position vector signs to remove need for test
 		// test if we are heading towards the Mun
 		//set distToTarget1 to targetObject:DISTANCE.
