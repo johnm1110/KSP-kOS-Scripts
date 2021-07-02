@@ -5,7 +5,7 @@ declare function phaseAngle {
 	declare parameter radiusB.
 	declare parameter targetObject.
 
-	local data is list().
+	//local data is list().
 	
 	// calculate the parameters of the transfer orbit to determine time of flight
 	local transferSemiMajorAxis is (radiusA + radiusB) / 2. // semi-major axis of transfer ellipse
@@ -20,8 +20,8 @@ declare function phaseAngle {
 	local meanAngularMotionTarget is 360 / targetObject:ORBIT:PERIOD.  // angular velocity in deg/s
 	local phaseAngleAtDeparture is transferSweepAngle - meanAngularMotionTarget * TOF.
 	
-	local data is list(phaseAngleAtDeparture,TOF).
-	return data.
+	//local data is list(phaseAngleAtDeparture,TOF).
+	return phaseAngleAtDeparture.
 	//return TOF.
 }
 

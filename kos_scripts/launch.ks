@@ -1,7 +1,6 @@
 
 // Set some variables
 set currentStage to 0.
-set targetRoll to 180.
 set orbitInsertionAlt to 70000.
 
 // set up steering and throttle
