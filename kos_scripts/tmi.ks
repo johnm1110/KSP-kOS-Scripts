@@ -20,44 +20,33 @@
 		lock kerbinPosition to -1 * KERBIN:position.
 		// calculate the angle between the two position vectors, this is our current phase angle to the target
 		set currentPhaseAngle to vang(kerbinPosition,targetPosition).
-		
-		// the angle to the Mun can not be over 180 degrees, so we need to test if we are movng away
-		// from the Mun and subtract the angle from 360, once we cross 180 degrees the phase angle
-		// will be as calculated.
+		// since the angle returned is between 0 and 180 degrees it needs to be checked for -180 or 180 degrees
+		// with negative angles indicating the spacecraft has moved past the phase angle at departure
+		// check for the sign of the cross product of positions in left handed notation
+        set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
 		set checkPhaseAngle to vcrs(kerbinPosition,targetPosition).
-		if checkPhaseAngle:Y < 0 { set currentPhaseAngle to 360 - }
-		// TODO: make this better, i.e. use position vector signs to remove need for test
-		// test if we are heading towards the Mun
-		//set distToTarget1 to targetObject:DISTANCE.
-		//wait 0.01. // no need for a large wait, only need a single physics tick
-		//set distToTarget2 to targetObject:DISTANCE.
-		//if (distToTarget2 - distToTarget1) > 0 { set currentPhaseAngle to 360 - currentPhaseAngle. }
-
-		// calculate time to burn
-		// a phase angle less than gamma results in negative time to burn
-		if currentPhaseAngle > phaseAngleAtDeparture { set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture. } 
-			else { set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture + 360. }
-		set meanAngularMotionShip to 360 / SHIP:ORBIT:PERIOD.
-		set meanAngularMotionTarget to 360 / targetObject:ORBIT:PERIOD.  // angular velocity in deg/s
-		set meanAngularMotionTotal to ABS(meanAngularMotionShip - meanAngularMotionTarget).
+		if checkPhaseAngle:Y > 0 { set deltaPhaseAngle to deltaPhaseAngle + 180. }
+		// calculate mean angular velocity, the angular velocity difference of the spacecraft and target
+		set meanAngularMotionShip to 360 / SHIP:ORBIT:PERIOD. // angular velocity of spacecraft in deg/s
+		set meanAngularMotionTarget to 360 / targetObject:ORBIT:PERIOD.  // angular velocity of target in deg/s
+		set meanAngularMotionTotal to ABS(meanAngularMotionShip - meanAngularMotionTarget). // mean angular velocity
+		// calculate the time to the phase angle at departure in seconds
 		set timeUntilPhase to deltaPhaseAngle / meanAngularMotionTotal.
 			
 		// TODO: add Karbal Alarm Clock alarm for burn pause game? this sill need to be out of a loop
 		// maybe put prints in a loop and use locks to force update
 		until timeUntilPhase < 60 {
 			set currentPhaseAngle to vang(kerbinPosition,targetPosition).
-			set check to VCRS(kerbinPosition,targetPosition).
-			if check:Y > 0 { set currentPhaseAngle to 360 - currentPhaseAngle. } // if positive we are moving away
+            set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
+		    set checkPhaseAngle to vcrs(kerbinPosition,targetPosition).
+		    if checkPhaseAngle:Y > 0 { set deltaPhaseAngle to deltaPhaseAngle + 180. }
 			set timeUntilPhase to deltaPhaseAngle / meanAngularMotionTotal.
-				if currentPhaseAngle > phaseAngleAtDeparture {
-					set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture. } 
-					else { set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture + 360. }
 			print "Waiting for injection window" at (0,0).
 			print "Phase angle at departure (deg) : " + round(phaseAngleAtDeparture,2) + "   " at (0,1).
 			print "Current phase angle (deg)      : " + round(currentPhaseAngle,2) + "   " at (0,2).
 			print "Time to TMI (s)                : " + round(timeUntilPhase) + "      " at (0,3).
 			//print "Mun position                   : " + targetPosition + "                 " at (0,4).
-			//print "Kerbin position                : " + check + "                 " at (0,5).
+			print "Kerbin position                : " + checkPhaseAngle + "                 " at (0,5).
 			//print "Cross product                  : " + setBit + "       " at (0,6).
 			//print "Cross product magnitude        : " + check:MAG + "        " at (0,7).
 		}
@@ -84,6 +73,7 @@
 		// KERBIN:POSITION returns the position of Kerbin with respect to the ship, we want the ship's position
 		// with respect to Kerbin so we negate the vector
 		lock kerbinPosition to -KERBIN:position.
+		// as the burn is close currentPhaseAngle will be less than 180, no need for a check
 		set currentPhaseAngle to vang(kerbinPosition,targetPosition).
 
 		// calulate delta v needed for injection burn 
