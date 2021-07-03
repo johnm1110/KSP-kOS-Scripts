@@ -46,7 +46,7 @@ set periapsisTarget to 55000. 	// Target periapsis in meters
 set radiusTMI to 11500000.  // document this
 
 // impact site
-//set landingSite to WAYPOINT("East Crater Anomaly").
+//set impactSite to WAYPOINT("East Crater Anomaly").
 
 set program to 2.	// no launch window
 

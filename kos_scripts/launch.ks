@@ -1,7 +1,5 @@
-
 // Set some variables
 set currentStage to 0.
-set orbitInsertionAlt to 70000.
 
 // set up steering and throttle
 lock throttle to throttleLimit.
@@ -53,7 +51,7 @@ until program = 0 {
 			wait 1.
 		}.
 		print "Main throttle up. Two seconds to stabilize it.".
-		set throttleLimit to twrLowerAtmo / twrStage1.
+		set throttleLimit to twrLowerAtmo / currentTWR.
 		wait 1.
 		print "...4".
 		wait 1.
@@ -78,7 +76,7 @@ until program = 0 {
 			until SHIP:MAXTHRUST < 0.001 {
 				wait 0.1.
 				if(steeringPitch>5){ set steeringPitch to steeringPitch - dPitchStage1 * 0.1. }
-				//if(steeringRoll<360){ set steeringRoll to steeringRoll + 0.5. } // roll to 0 degrees at 5 degrees per second
+				if(steeringRoll<360){ set steeringRoll to steeringRoll + 0.5. } // roll to 0 degrees at 5 degrees per second
 			}
 			print "Stage " + currentStage + " seperation at: " + time:clock + " UT!".
 			set throttleLimit to 0.
@@ -86,7 +84,7 @@ until program = 0 {
 			stage.
 			kuniverse:pause.	// this allows me to record the data just at staging
 			wait 0.5.
-			set throttleLimit to twrMidAtmo / twrStage2.
+			set throttleLimit to twrMidAtmo / currentTWR.
 			set steeringRoll to 0.
 			set currentStage to 2. // TODO: launcher files need to tell how many stages
 		}

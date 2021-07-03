@@ -1,4 +1,4 @@
-if payload = "Moho" {
+function moho {
 
 	// intial throttle and steering
 	set throttleLimit to 0.
@@ -21,7 +21,7 @@ if payload = "Moho" {
 	set mission to 0.	// mission 0 is orbit the current body
 }
 
-if payload = "Muna" {
+function muna {
 	// intial throttle and steering
 	set throttleLimit to 0.
 	set steeringPitch to 90.	// start pointing up
@@ -41,23 +41,10 @@ if payload = "Muna" {
 	set apoapsisTarget to  250000. 	// Target apoapsis in meters
 	set periapsisTarget to 55000. 	// Target periapsis in meters
 	set radiusTMI to 11500000.  // document this
-
-	// landing zone
-	set landingZoneTerrainHeight to 4500. // this is based on in game data, trying to avoid data I should not know
-	set PDIDesiredAltitude to 6000.
-	set radiusPDI to PDIDesiredAltitude + landingZoneTerrainHeight.
-	//set landingSite to WAYPOINT("East Crater Anomaly").
-	set downRangeDistance to 20000. // move this to initialization section
-
-	set program to 2.	// no launch window
-
-	// set mission parameters
-	set mission to 1.	// mission 0 is orbit the current body, 1 is escape burn for Mun or Minmus flyby
 }
 
-if payload = "Explorer" {
+function explorer {
 	
-
 	// intial throttle and steering
 	set throttleLimit to 0.
 	set steeringPitch to 90.	// start pointing up
@@ -77,7 +64,7 @@ if payload = "Explorer" {
 	set mission to 0.	// mission 0 is orbit the current body
 }
 
-if payload = "Maxwell" {
+function maxwell {
 	set launchSite to WAYPOINT("Woomerang Launch Site").
 
 	// intial throttle and steering
@@ -112,7 +99,7 @@ if payload = "Maxwell" {
 	set mission to 0.	// mission 0 is orbit the current body
 }
 
-if payload = "CommSat" {
+function commSat {
 	//set launchSite to WAYPOINT("Woomerang Launch Site").
 	set launchSite to WAYPOINT("KSC").
 

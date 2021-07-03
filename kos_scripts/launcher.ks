@@ -1,4 +1,4 @@
-if booster = "Juno1" {
+function juno1 {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -8,7 +8,7 @@ if booster = "Juno1" {
 	set dPitchStage3 to 0.94. // a little more aggressive at this stage
 }
 
-if booster = "Juno2" {
+function juno {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -31,7 +31,7 @@ if booster = "Juno2" {
 	set twrUpperAtmo to 0.8.
 }
 
-if booster = "Juno3" {
+function juno3 {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -56,7 +56,7 @@ if booster = "Juno3" {
 	set twrUpperAtmo to 0.8.
 }
 
-if booster = "Juno4" {
+function Juno4 {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -81,7 +81,7 @@ if booster = "Juno4" {
 	set twrUpperAtmo to 0.8.
 }
 
-if booster = "Redstone1" {
+function Redstone1 {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -97,7 +97,7 @@ if booster = "Redstone1" {
 	set stage1Isp to 265.
 }
 
-if booster = "Redstone2" {
+function Redstone2 {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -117,7 +117,7 @@ if booster = "Redstone2" {
 	set twrUpperAtmo to 0.8.
 }
 
-if booster = "Redstone2a" {
+function Redstone2a {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -142,7 +142,7 @@ if booster = "Redstone2a" {
 	set twrUpperAtmo to 0.8.
 }
 
-if booster = "Atlas1" {
+function Atlas1 {
 	// intial pitch over maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
@@ -157,7 +157,7 @@ if booster = "Atlas1" {
 	set stage1Isp to 285.
 	
 	// the stage numbers are in order of activation, not based on KSP naming conventions
-	set twrStage3 to 1.25.					// see if these twr variables can be pulled from API
+	set twrStage3 to 2.04.					// see if these twr variables can be pulled from API
 	set twrStage2 to 3.64.
 	set twrStage1 to 1.56.
 	
@@ -167,8 +167,8 @@ if booster = "Atlas1" {
 	set twrUpperAtmo to 0.8.
 }
 
-if booster = "Atlas2" {
-	// intial pitch over maneuver
+function Atlas2 {
+	// intial pitchover maneuver
 	set pitchOverVelocity to 50.				// velocity for intial pitch over
 
 	// gravity turn pitch settings (deg/s), twr and dPitch are inverse proportions
