@@ -34,7 +34,7 @@ set steeringRoll to 0.	    // start at 0 degrees so the booster doesn't hit the 
 // Set these variables before the flight begins
 set apoapsisPlanned to  100000. 	// Target apoapsis in meters
 set periapsisPlanned to 100000. 	// Target periapsis in meters
-set errorAp to 0.995.			// allowable deviation from desired apoapsis
+set errorAp to 0.0005.		    	// allowable error from desired apoapsis
 set staging to 0.
 set inclinationFinal to 0.
 set GM to KERBIN:MU.				// Kerbin's gravitational parameter

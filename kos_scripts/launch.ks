@@ -59,7 +59,7 @@ until program = 0 {
 		print "Main throttle up. Two seconds to stabilize it.".
 		stage.  // ignite engine 
 		set throttleLimit to 0.20.
-		if ship:maxthrust > 0.001 { // check if engines ingnited and proceed
+		if ship:maxthrust > 0.001 { // check if engines ignited and proceed
 		    wait 1.
 		    print "...2".
 		    wait 1.
@@ -82,7 +82,6 @@ until program = 0 {
 				wait 0.1.
 				if(steeringPitch>5){ set steeringPitch to steeringPitch - dPitchStage1 * 0.1. }
 				//if(steeringRoll<360){ set steeringRoll to steeringRoll + 0.5. } // roll to 0 degrees at 5 degrees per second
-				//if currentTWR > 0 { set throttleLimit to twrLowerAtmo / currentTWR. }
 			}
 			print "Stage " + currentStage + " seperation at: " + time:clock + " UT!".
 			set throttleLimit to 0.
@@ -96,10 +95,9 @@ until program = 0 {
 		}
 		if currentStage = 2 {
 			set ve to stage2Isp * 9.81. // convert specific impulse to exhaust velocity
-			until ship:apoapsis > (apoapsisPlanned * errorAp) {
+			until ship:apoapsis > (-1 * apoapsisPlanned * errorAp + apoapsisPlanned) {
 				wait 0.1.
 				if(steeringPitch>2){ set steeringPitch to steeringPitch - dPitchStage2 * 0.1. }
-				//if currentTWR > 0 { set throttleLimit to twrMidAtmo / currentTWR. }
 				if SHIP:MAXTHRUST < 0.001 {
 					print "Stage " + currentStage + " seperation at: " + time:clock + " UT!".
 					lock throttle to 0.
