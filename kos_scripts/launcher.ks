@@ -148,8 +148,8 @@ function Atlas1 {
 
 	// gravity turn pitch settings (deg/s), twr and dPitch are inverse proportions
 	set dPitchStage3 to 0.20.
-	set dPitchStage2 to 0.90.
-	set dPitchStage1 to 0.65.
+	set dPitchStage2 to 0.95.
+	set dPitchStage1 to 0.75.
 
 	// Engine ISP, set manually until I can extract it in the script
 	set stage3Isp to 330.
@@ -163,7 +163,7 @@ function Atlas1 {
 	
 	// set up engine parameters
 	set twrLowerAtmo to 1.4.
-	set twrMidAtmo to 1.0.
+	set twrMidAtmo to 1.3.
 	set twrUpperAtmo to 0.8.
 }
 

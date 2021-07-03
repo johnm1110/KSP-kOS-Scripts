@@ -45,30 +45,35 @@ until program = 0 {
 		lock steering to heading(steeringDir,steeringPitch,steeringRoll).
 		set countdown to 10.
 		print "Counting down:".
-		until countdown = 5 {
+		until countdown = 4 {
 			print "..." + countdown.
 			set countdown to countdown - 1.
 			wait 1.
 		}.
-		print "Main throttle up. Two seconds to stabilize it.".
-		set throttleLimit to twrLowerAtmo / currentTWR.
-		wait 1.
 		print "...4".
 		wait 1.
-		print "...3".
-		wait 1.
-		print "...2".
-		wait 1.
-		print "Engine sequence start.".	
+		// the following sequence is t-3 seconds
+		print "Engine sequence start.".
+		print "Uncoupling umbilicals".
+		AG10 on.
+		print "Main throttle up. Two seconds to stabilize it.".
 		stage.  // ignite engine 
-		wait 1.
-		print "Liftoff at " + time:clock + " UT!".
-		set launchTime to time.
-		stage.					// release docking clamps 
-		set currentStage to 1.
-		wait until ship:VERTICALSPEED > pitchOverVelocity.
-		print "Begining pitch and roll program.".
-		set program to 3.
+		set throttleLimit to 0.20.
+		if ship:maxthrust > 0.001 { // check if engines ingnited and proceed
+		    wait 1.
+		    print "...2".
+		    wait 1.
+		    print "...1".
+		    wait 1.
+		    print "Liftoff at " + time:clock + " UT!".
+		    set launchTime to time.
+		    stage.					// release docking clamps 
+		    set currentStage to 1.
+		    set throttleLimit to twrLowerAtmo / currentTWR.
+		    until ship:VERTICALSPEED > pitchOverVelocity {}
+		    print "Begining pitch and roll program.".
+		    set program to 3.
+		} else set program to 0. // engines failed, exit before releasing socking clamps
 	}	
 
 	if program = 3 {
@@ -76,13 +81,14 @@ until program = 0 {
 			until SHIP:MAXTHRUST < 0.001 {
 				wait 0.1.
 				if(steeringPitch>5){ set steeringPitch to steeringPitch - dPitchStage1 * 0.1. }
-				if(steeringRoll<360){ set steeringRoll to steeringRoll + 0.5. } // roll to 0 degrees at 5 degrees per second
+				//if(steeringRoll<360){ set steeringRoll to steeringRoll + 0.5. } // roll to 0 degrees at 5 degrees per second
+				//if currentTWR > 0 { set throttleLimit to twrLowerAtmo / currentTWR. }
 			}
 			print "Stage " + currentStage + " seperation at: " + time:clock + " UT!".
 			set throttleLimit to 0.
-			wait 0.2.
+			wait 1.0.
 			stage.
-			kuniverse:pause.	// this allows me to record the data just at staging
+			//kuniverse:pause.	// this allows me to record the data just at staging
 			wait 0.5.
 			set throttleLimit to twrMidAtmo / currentTWR.
 			set steeringRoll to 0.
@@ -93,14 +99,15 @@ until program = 0 {
 			until ship:apoapsis > (apoapsisPlanned * errorAp) {
 				wait 0.1.
 				if(steeringPitch>2){ set steeringPitch to steeringPitch - dPitchStage2 * 0.1. }
+				//if currentTWR > 0 { set throttleLimit to twrMidAtmo / currentTWR. }
 				if SHIP:MAXTHRUST < 0.001 {
 					print "Stage " + currentStage + " seperation at: " + time:clock + " UT!".
-					set throttleLimit to 0.
+					lock throttle to 0.
 					wait 0.2.
 					stage.
-					kuniverse:pause.	// this allows me to record the data just at staging
+					//kuniverse:pause.	// this allows me to record the data just at staging
 					wait 0.5.
-					set throttleLimit to 1.0.
+					lock throttle to 1.0.
 					set currentStage to 3.			// TODO: launcher files need to tell how many stages
 				}
 			}
@@ -137,7 +144,7 @@ until program = 0 {
 		until timeUntilBurn < 0.01 {
 			lock STEERING to SHIP:PROGRADE.
 			print "Waiting for orbital insertion burn (program 4)" 					 at (0,0).
-			print "Burn delta v (m/s)     : " + round(dVCirc,2) 		  + "          " at (0,1).
+			print "Burn delta v (m/s)     : " + round(dVCirc,2) 	  + "          " at (0,1).
 			print "Total time of burn (s) : " + round(burnTime,2) 	  + "          " at (0,2).
 			print "Burn ETA (s)           : " + round(timeUntilBurn,2) + "	       " at (0,3).
 			wait 0.01.

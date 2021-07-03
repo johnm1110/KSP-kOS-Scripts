@@ -30,8 +30,6 @@ set throttleLimit to 0.
 set steeringPitch to 90.	// start pointing up
 set steeringDir to 90.		// head east
 set steeringRoll to 0.	    // start at 0 degrees so the booster doesn't hit the launch tower, we'll roll later
-lock throttle to throttleLimit.
-lock steering to heading(steeringDir,steeringPitch,steeringRoll).
 
 // Set these variables before the flight begins
 set apoapsisPlanned to  100000. 	// Target apoapsis in meters
@@ -48,7 +46,7 @@ set inclinationTarget to 0.0.
 set apoapsisTarget to  250000. 	// Target apoapsis in meters
 set periapsisTarget to 55000. 	// Target periapsis in meters
 //set orbitAltitudePlanned to 11950000.  // document this
-set orbitAltitudePlanned to targetObject:orbit:altitude.  // Mun's orbit altitude over Kerbin
+set orbitAltitudePlanned to targetObject:altitude.  // Mun's orbit altitude over Kerbin
 set orbitAltitudeOffset to 0.		// over or under shoot Mun's orbit by this amount
 
 // landing zone
