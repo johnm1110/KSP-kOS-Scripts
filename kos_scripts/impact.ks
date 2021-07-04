@@ -70,6 +70,23 @@ print "Spot             : " + spot.
 print "Impact target    : " + impactSite.
 print "Location         : " + impactSite:geoposition.
 
+set patchTime to timestamp() + ship:orbit:NEXTPATCHETA + 100.
+
+// get impact geoposition, then get the patch position to it
+//local impactPositionPatch is positionat(spot:position,patchTime).
+// get waypoint geoposition, then get ship patch position
+//local targetPositionPatch is positionat(impactSite:position,patchTime).
+// local deltav is velocityat(ship,patchTime) * sin (vang(impactPositionPatch,targetPositionPatch))
+// use patch velocity of ship * sin of previous angle
+// us that as delta v for a radial burn just past patch point
+// do more research on vectors and orbits, this probably isn't correct
+
+//local shipPositionPatch is positionat(ship,patchTime).
+//local targetPositionPatch is positionat(ship:orbit:nextpatch:body,patchTime).
+//local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+
+// print position of impact as differnce to desired impact point
+// as meters to N/S and E/W
 
 //print "velocity relative to this body is: " + shipVelocityPatch:mag.
 //print "velocity relative to the Mun is:   " + shipVelocityPatchRel:mag.
