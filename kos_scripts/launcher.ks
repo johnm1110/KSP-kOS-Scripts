@@ -163,7 +163,7 @@ function Atlas1 {
 	
 	// set up engine parameters
 	set twrLowerAtmo to 1.4.
-	set twrMidAtmo to 1.3.
+	set twrMidAtmo to 1.25.
 	set twrUpperAtmo to 0.8.
 }
 

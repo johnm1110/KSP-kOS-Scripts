@@ -27,6 +27,7 @@ run functions.
 
 // intial throttle and steering
 set throttleLimit to 0.
+lock throttle to throttleLimit.
 set steeringPitch to 90.	// start pointing up
 set steeringDir to 90.		// head east
 set steeringRoll to 0.	    // start at 0 degrees so the booster doesn't hit the launch tower, we'll roll later
@@ -53,7 +54,7 @@ set orbitAltitudeOffset to 0.		// over or under shoot Mun's orbit by this amount
 set impactSite to waypoint("Site T3-P").
 
 // launch program start point
-set program to 2.	// no launch window
+set program to 13.	// no launch window
 
 // set mission parameters
 // mission 0 : orbit current body

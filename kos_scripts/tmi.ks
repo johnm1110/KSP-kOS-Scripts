@@ -1,17 +1,12 @@
     if program = 11 { // wait for Trans Munar Injection (TMI) burn
         clearscreen.
         RCS off.
-        
+        // get the phase angle at departure, gamma-1
         set TARGET to targetObject.
-        local aShip is SHIP:ORBIT:SEMIMAJORAXIS.
-        local aTarget is TARGET:ORBIT:SEMIMAJORAXIS - apoapsisTarget + 50000.
-        
-        set phaseAngleData to phaseAngle(aShip,aTarget,targetObject).
-        set phaseAngleAtDeparture to phaseAngleData[0].
-        set timeOfFlight to phaseAngleData[1].
+        local aShip is SHIP:ORBIT:SEMIMAJORAXIS.    // semi major axis of the spacecraft, this is passed now due needing a more general distance
+        local aTarget is TARGET:ORBIT:SEMIMAJORAXIS.    // again need a general distance until the next program
+        set phaseAngleAtDeparture to phaseAngle(aShip,aTarget,targetObject).
         lock STEERING to SHIP:PROGRADE.
-
-
         // determine positions to calculate the current phase angle
         // get the target position in relation to the ship then transform it to the SOI body
         lock targetPosition to TARGET:POSITION - SHIP:BODY:POSITION.
@@ -23,9 +18,12 @@
         // since the angle returned is between 0 and 180 degrees it needs to be checked for -180 or 180 degrees
         // with negative angles indicating the spacecraft has moved past the phase angle at departure
         // check for the sign of the cross product of positions in left handed notation
-        set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
         set checkPhaseAngle to vcrs(kerbinPosition,targetPosition).
-        if checkPhaseAngle:Y > 0 { set deltaPhaseAngle to deltaPhaseAngle + 180. }
+        if checkPhaseAngle:Y > 0 { set currentPhaseAngle to 360 - currentPhaseAngle. }
+        //if (currentPhaseAngle - phaseAngleAtDeparture) < 0 { set currentPhaseAngle to 360 + currentPhaseAngle. }
+        set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
+        if deltaPhaseAngle < 0 { set deltaPhaseAngle to 360 + deltaPhaseAngle. }
+
         // calculate mean angular velocity, the angular velocity difference of the spacecraft and target
         set meanAngularMotionShip to 360 / SHIP:ORBIT:PERIOD. // angular velocity of spacecraft in deg/s
         set meanAngularMotionTarget to 360 / targetObject:ORBIT:PERIOD.  // angular velocity of target in deg/s
@@ -37,16 +35,18 @@
         // maybe put prints in a loop and use locks to force update
         until timeUntilPhase < 60 {
             set currentPhaseAngle to vang(kerbinPosition,targetPosition).
-            set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
             set checkPhaseAngle to vcrs(kerbinPosition,targetPosition).
-            if checkPhaseAngle:Y > 0 { set deltaPhaseAngle to deltaPhaseAngle + 180. }
+            if checkPhaseAngle:Y > 0 { set currentPhaseAngle to 360 - currentPhaseAngle. }
+            //if (currentPhaseAngle - phaseAngleAtDeparture) < 0 { set currentPhaseAngle to 360 + currentPhaseAngle. }
+            set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
+            if deltaPhaseAngle < 0 { set deltaPhaseAngle to 360 + deltaPhaseAngle. }
             set timeUntilPhase to deltaPhaseAngle / meanAngularMotionTotal.
             print "Waiting for injection window" at (0,0).
             print "Phase angle at departure (deg) : " + round(phaseAngleAtDeparture,2) + "   " at (0,1).
             print "Current phase angle (deg)      : " + round(currentPhaseAngle,2) + "   " at (0,2).
             print "Time to TMI (s)                : " + round(timeUntilPhase) + "      " at (0,3).
-            //print "Mun position                   : " + targetPosition + "                 " at (0,4).
-            print "Kerbin position                : " + checkPhaseAngle + "                 " at (0,5).
+            print "Phase angle delta              : " + deltaPhaseAngle + "                 " at (0,4).
+            print "Kerbin position                : " + checkPhaseAngle:Y + "                 " at (0,5).
             //print "Cross product                  : " + setBit + "       " at (0,6).
             //print "Cross product magnitude        : " + check:MAG + "        " at (0,7).
         }
@@ -54,21 +54,19 @@
     }
 
     if program = 12 { // Trans Munar Injection (TMI) burn
-        kuniverse:pause.	// pause before burn
+        // TODO: this needs to be updated to use positionat for the information right at the time of the burn
+        kuniverse:pause.	// pause before burn program entry, mainly if I am away from the computer for some reason
         clearscreen.
-        RCS off.
+        RCS off.    // test if this is a probe and whether or not a reaction wheel can handle this
         lock STEERING to SHIP:PROGRADE.
         
-        local radiusA is ship:orbit:semimajoraxis.
-        local radiusB is orbitAltitudePlanned + body:radius.
+ 
         
-        set rPe to SHIP:ALTITUDE + BODY:RADIUS.
-        set aTarget to TARGET:ORBIT:SEMIMAJORAXIS.
-            
-        set phaseAngleData to phaseAngle(rPE,aTarget,targetObject).
-        set phaseAngleAtDeparture to phaseAngleData[0].
-        set timeOfFlight to phaseAngleData[1].
-
+        // get the phase angle at departure with more precision
+        set spacecraftRBurn to SHIP:ALTITUDE + BODY:RADIUS.    // more precision is now needed since the burn is within 60 seconds
+        set targetRBurn to targetObject:altitude + body:radius.    // again more precision if the orbit is not circular
+        set phaseAngleAtDeparture to phaseAngle(spacecraftRBurn,targetRBurn,targetObject).
+        
         lock targetPosition to TARGET:POSITION - SHIP:BODY:POSITION.
         // KERBIN:POSITION returns the position of Kerbin with respect to the ship, we want the ship's position
         // with respect to Kerbin so we negate the vector
@@ -77,9 +75,10 @@
         set currentPhaseAngle to vang(kerbinPosition,targetPosition).
 
         // calulate delta v needed for injection burn 
-        local a1 is SHIP:ORBIT:SEMIMAJORAXIS.
-        
+        local radiusA is ship:altitude + body:radius.           // more precision but need postionat for more
+        local radiusB is orbitAltitudePlanned + body:radius.    // TODO: look at what you are doing here
         local aTransferOrbit is (radiusA + radiusB) / 2.		// semi-major axis of transfer ellipse
+        local GM is KERBIN:MU.
         local ViA is sqrt(GM / radiusA).			// initial velocity at point A
         local VfB is sqrt(GM / radiusB).			// final velocity at point B
         
@@ -105,7 +104,7 @@
 
         set timeUntilBurn to timeUntilPhase - burnTime / 2.
         
-        until timeUntilBurn < 0 {
+        until timeUntilBurn < 0.01 {
             lock STEERING to SHIP:PROGRADE.
             set currentPhaseAngle to vang(kerbinPosition,targetPosition).
             set deltaPhaseAngle to currentPhaseAngle - phaseAngleAtDeparture.
@@ -133,36 +132,39 @@
         clearscreen.
     }
     if program = 13 { // cruise to target, maybe mid course corrections?
+        clearscreen.
         // TODO: add in course correction code. maybe as program 14
         until ORBIT:TRANSITION = "ESCAPE" {
         
-        //lock STEERING TO LOOKDIRUP( SHIP:PROGRADE:VECTOR, SUN:POSITION ). // + R(0,0,-45).
-        //lock steering to prograde + R(-90,0,0).
-        lock steering to sun:position.
-        
-        set transitionETA to ORBIT:NEXTPATCHETA.
-        set transitionETASeconds to FLOOR(mod(transitionETA,60)).
-        set transitionETAMinutes to FLOOR(mod(transitionETA / 60,60)).
-        set transitionETAHours   to FLOOR(mod(transitionETA / 3600,60)).
-        
-        set transitionPeriapsis to ORBIT:NEXTPATCH:NEXTPATCHETA.
-        set transitionPeriapsisSeconds to FLOOR(mod(transitionPeriapsis,60)).
-        set transitionPeriapsisMinutes to FLOOR(mod(transitionPeriapsis / 60,60)).
-        set transitionPeriapsisHours   to FLOOR(mod(transitionPeriapsis / 3600,60)).
-        
-        set correctionETA to ORBIT:NEXTPATCHETA - 3600.				// TODO: the correction ETA needs to be determined from telemetry
-        set correctionETASeconds to FLOOR(mod(correctionETA,60)).
-        set correctionETAMinutes to FLOOR(mod(correctionETA / 60,60)).
-        set correctionETAHours   to FLOOR(mod(correctionETA / 3600,60)).
-        
-        print "Waiting for transition to " + TARGET + " SOI (P-8)" at (0,0).
-        print "Time to transition (hh:mm:ss) : " + transitionETAHours + ":" +  transitionETAMinutes + ":" + transitionETASeconds + "   " at (0,1).
-        print "Periapsis (m)                 : " + round(ORBIT:NEXTPATCH:PERIAPSIS) + "     " at (0,2).
-        print "Time to escape (hh:mm:ss)     : " + transitionPeriapsisHours + ":" +  transitionPeriapsisMinutes + ":" + transitionPeriapsisSeconds + "     " at (0,3).
-        print "Inclination (deg)             : " + round(ORBIT:NEXTPATCH:INCLINATION,2) + "     " at (0,4).
-        //print "Destination high space (km)   : " + targetHighSpace/1000 + "     " at (0,5).
-        //print "Destination low space (km)    : " + targetLowSpace/1000 + "     " at (0,6).
-        print "Correction burn in (hh:mm:ss) : " + correctionETAHours + ":" +  correctionETAMinutes + ":" + correctionETASeconds + "     " at (0,7).
+            //lock STEERING TO LOOKDIRUP( SHIP:PROGRADE:VECTOR, SUN:POSITION ). // + R(0,0,-45).
+            //lock steering to prograde + R(-90,0,0).
+            //lock steering to sun:position.
+            lock steering to prograde.
+            //lock steering to lookdirup(v(1,0,1),sun:position).
+
+            set transitionETA to ORBIT:NEXTPATCHETA.
+            set transitionETASeconds to FLOOR(mod(transitionETA,60)).
+            set transitionETAMinutes to FLOOR(mod(transitionETA / 60,60)).
+            set transitionETAHours   to FLOOR(mod(transitionETA / 3600,60)).
+            
+            set transitionPeriapsis to ORBIT:NEXTPATCH:NEXTPATCHETA.
+            set transitionPeriapsisSeconds to FLOOR(mod(transitionPeriapsis,60)).
+            set transitionPeriapsisMinutes to FLOOR(mod(transitionPeriapsis / 60,60)).
+            set transitionPeriapsisHours   to FLOOR(mod(transitionPeriapsis / 3600,60)).
+            
+            set correctionETA to ORBIT:NEXTPATCHETA - 3600.				// TODO: the correction ETA needs to be determined from telemetry
+            set correctionETASeconds to FLOOR(mod(correctionETA,60)).
+            set correctionETAMinutes to FLOOR(mod(correctionETA / 60,60)).
+            set correctionETAHours   to FLOOR(mod(correctionETA / 3600,60)).
+            
+            print "Waiting for transition to " + TARGET + " SOI (P-8)" at (0,0).
+            print "Time to transition (hh:mm:ss) : " + transitionETAHours + ":" +  transitionETAMinutes + ":" + transitionETASeconds + "   " at (0,1).
+            print "Periapsis (m)                 : " + round(ORBIT:NEXTPATCH:PERIAPSIS) + "     " at (0,2).
+            print "Time to escape (hh:mm:ss)     : " + transitionPeriapsisHours + ":" +  transitionPeriapsisMinutes + ":" + transitionPeriapsisSeconds + "     " at (0,3).
+            print "Inclination (deg)             : " + round(ORBIT:NEXTPATCH:INCLINATION,2) + "     " at (0,4).
+            //print "Destination high space (km)   : " + targetHighSpace/1000 + "     " at (0,5).
+            //print "Destination low space (km)    : " + targetLowSpace/1000 + "     " at (0,6).
+            print "Correction burn in (hh:mm:ss) : " + correctionETAHours + ":" +  correctionETAMinutes + ":" + correctionETASeconds + "     " at (0,7).
         }
         local theta is inclinationFinalMun - SHIP:ORBIT:INCLINATION.
 

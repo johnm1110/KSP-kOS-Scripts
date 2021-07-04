@@ -41,7 +41,7 @@ until program = 0 {
 		}
 	}
 	
-	if program = 2 {
+	if program = 2 { // liftoff
 		lock steering to heading(steeringDir,steeringPitch,steeringRoll).
 		set countdown to 10.
 		print "Counting down:".
@@ -85,10 +85,10 @@ until program = 0 {
 			}
 			print "Stage " + currentStage + " seperation at: " + time:clock + " UT!".
 			set throttleLimit to 0.
-			wait 1.0.
+			wait 0.2.
 			stage.
-			//kuniverse:pause.	// this allows me to record the data just at staging
-			wait 0.5.
+			kuniverse:pause.	// this allows me to record the data just at staging
+			wait 1.0.
 			set throttleLimit to twrMidAtmo / currentTWR.
 			set steeringRoll to 0.
 			set currentStage to 2. // TODO: launcher files need to tell how many stages
@@ -103,8 +103,8 @@ until program = 0 {
 					lock throttle to 0.
 					wait 0.2.
 					stage.
-					//kuniverse:pause.	// this allows me to record the data just at staging
-					wait 0.5.
+					kuniverse:pause.	// this allows me to record the data just at staging
+					wait 1.0.
 					lock throttle to 1.0.
 					set currentStage to 3.			// TODO: launcher files need to tell how many stages
 				}
@@ -154,8 +154,7 @@ until program = 0 {
 		set throttleLimit to 0.
 		wait 0.1.
 		kuniverse:pause.	// this allows me to record the data just at staging
-		if mission=0 set program to 0.
-		if mission>0 set program to 0.	// TODO: improve this
+		set program to 0.
 	}
 wait 0.001.
 }
@@ -163,5 +162,7 @@ wait 0.001.
 print "Orbit!" at (0,6).
 lock throttle to 0.
 set ship:control:pilotmainthrottle to 0.
+if mission=0 set program to 0.
+if mission>0 set program to 11.	// set program to TMI TODO: improve this
 
 // end program
