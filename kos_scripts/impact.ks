@@ -1,47 +1,70 @@
-//calculate velocity of ship 60 seconds past SOI patch point
-// This example imagines you are on an orbit that is leaving
-// the current body and on the way to transfer to another orbit:
+//
+set impactTimeStamp to timestamp() + ship:orbit:NEXTPATCHETA + 100.
 
-// Later_time is 1 minute into the Mun orbit patch:
-local patchETA is timestamp() + ship:orbit:NEXTPATCHETA + 60.
-local shipVelocityPatch is VELOCITYAT(ship, patchETA):ORBIT.
-local targetVelocityPatch is VELOCITYAT(ship:orbit:NEXTPATCH:body, patchETA):ORBIT.
-
-// velocity of spacecraft relative to target
-local shipVelocityPatchRel is shipVelocityPatch - targetVelocityPatch.
-
-local shipPositionPatch is positionat(ship,patchETA).
-local targetPositionPatch is positionat(ship:orbit:nextpatch:body,patchETA).
+local shipPositionPatch is positionat(ship,impactTimeStamp).
+local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
 local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
 
-// guess at an intial time, this will always be less due to gravity accelarting the spacecraft
-//local timeInitial is shipPositionPatchRel:mag / shipVelocityPatchRel:mag.
-// test if the position is within 1 meter of Mun's surface
 set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
-local timeOffset is 0.
-set impactETA to timestamp() + ship:orbit:NEXTPATCHETA.// + timeInitial + timeOffset.
 
-until (altitudeDelta) < 1 {
-    local shipPositionPatch is positionat(ship,impactETA).
-    local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactETA).
-    local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+until (altitudeDelta) < 0 { // check until the altitude is negative
+    set impactTimeStamp to impactTimeStamp + 100.
 
-    set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+    local shipPositionCheck is positionat(ship,impactTimeStamp).
+    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+    local shipPositionCheckRel is targetPositionCheck - shipPositionCheck.
+
+    set altitudeDelta to shipPositionCheckRel:mag - ship:orbit:nextpatch:body:radius.
     //print altitudeDelta.
-    local timeOffset is timeOffset + 10.    
-    set impactETA to impactETA + timeOffset.
-    //print impactETA.
+    //print impactTimeStamp.
+}
+// turn back time by 100 seconds and begin checking every 10 seconds
+set impactTimeStamp to impactTimeStamp - 100. 
+local shipPositionPatch is positionat(ship,impactTimeStamp).
+local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+
+set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+
+until (altitudeDelta) < 0 { // check until the altitude is negative
+    set impactTimeStamp to impactTimeStamp + 10.
+    
+    local shipPositionCheck is positionat(ship,impactTimeStamp).
+    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+    local shipPositionCheckRel is targetPositionCheck - shipPositionCheck.
+
+    set altitudeDelta to shipPositionCheckRel:mag - ship:orbit:nextpatch:body:radius.
+    //print altitudeDelta.
+    //print impactTimeStamp.
+}
+// turn back time by 10 seconds and begin checking every 1 second
+set impactTimeStamp to impactTimeStamp - 10. 
+local shipPositionPatch is positionat(ship,impactTimeStamp).
+local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+
+set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+until (altitudeDelta) < 0 { // check until the altitude is negative
+    set impactTimeStamp to impactTimeStamp + 1.
+
+    local shipPositionCheck is positionat(ship,impactTimeStamp).
+    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+    local shipPositionCheckRel is targetPositionCheck - shipPositionCheck.
+
+    set altitudeDelta to shipPositionCheckRel:mag - ship:orbit:nextpatch:body:radius.
+    //print altitudeDelta.
+    //print impactTimeStamp.
 }
 
-local shipPositionPatch is positionat(ship,impactETA).
-local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactETA).
+local shipPositionPatch is positionat(ship,impactTimeStamp).
+local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
 local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
 local spot is mun:geopositionof(shipPositionPatch).
 set impactSite to waypoint("Site T3-P").
 
 clearscreen.
-local timeToImpact is ship:orbit:nextpatcheta + timeOffset.
-print "ETA to impact (s): " + timeToImpact.
+local impactETA is impactTimeStamp - timestamp().
+print "ETA to impact (s): " + impactETA.
 print "Alttiude (m)     : " + altitudeDelta.
 print "Spot             : " + spot.
 print "Impact target    : " + impactSite.
