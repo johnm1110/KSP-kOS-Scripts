@@ -24,8 +24,6 @@ function impactRecursion {
     return altitudeImpact.
 }
 
-FROM {local x is 10.} UNTIL x = 0 STEP {set x to x-1.} DO {
-
 from {local x is 100.} 
 until impactRecursion(timeImpactEstimate,x) < 0 
 step {set x to x + 100.}
