@@ -139,8 +139,8 @@
             //lock STEERING TO LOOKDIRUP( SHIP:PROGRADE:VECTOR, SUN:POSITION ). // + R(0,0,-45).
             //lock steering to prograde + R(-90,0,0).
             //lock steering to sun:position.
-            lock steering to prograde.
-            //lock steering to lookdirup(v(1,0,1),sun:position).
+            //lock steering to prograde.
+            lock steering to lookdirup(v(0,1,0),sun:position).
 
             set transitionETA to ORBIT:NEXTPATCHETA.
             set transitionETASeconds to FLOOR(mod(transitionETA,60)).
