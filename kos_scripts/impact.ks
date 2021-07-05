@@ -1,76 +1,98 @@
-// replace later but here now for script testing
+// replace later but here now for script testing, keep solar panels facing Kerbol
 lock steering to lookdirup(v(0,1,0),sun:position).
 
+//set initial parameters to just inside of the patch point
+set timeImpactEstimate to timestamp() + ship:orbit:NEXTPATCHETA + 100.
 
-//
-set impactTimeStamp to timestamp() + ship:orbit:NEXTPATCHETA + 100.
+local positionShipPatch is positionat(ship,timeImpactEstimate).
+local positionTargetPatch is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
+local positionShipRelTargetPatch is positionTargetPatch - positionShipPatch.  // position of ship relative to the taget body
+// calculate the distance from the surface of the target body, incorporate any scanned surface data if possible
+set altitudeDelta to positionShipRelTargetPatch:mag - ship:orbit:nextpatch:body:radius.
 
-local shipPositionPatch is positionat(ship,impactTimeStamp).
-local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
-local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+function impactRecursion {
+    parameter timeEstimate.
+    parameter timeOffset.
+    
+    local timeEstimate to timeEstimate + timeOffset.
 
-set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+    local positionShip is positionat(ship,timeEstimate).
+    local positionTarget is positionat(ship:orbit:nextpatch:body,timeEstimate).
+    local shipPositionRelTarget is positionTarget - positionShip.
+
+    local altitudeImpact to shipPositionRelTarget:mag - ship:orbit:nextpatch:body:radius.
+    return altitudeImpact.
+}
+
+FROM {local x is 10.} UNTIL x = 0 STEP {set x to x-1.} DO {
+
+from {local x is 100.} 
+until impactRecursion(timeImpactEstimate,x) < 0 
+step {set x to x + 100.}
+do {
+
+}
 
 until (altitudeDelta) < 0 { // check until the altitude is negative
-    set impactTimeStamp to impactTimeStamp + 100.
+    set timeImpactEstimate to timeImpactEstimate + 100.
 
-    local shipPositionCheck is positionat(ship,impactTimeStamp).
-    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+    local shipPositionCheck is positionat(ship,timeImpactEstimate).
+    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
     local shipPositionCheckRel is targetPositionCheck - shipPositionCheck.
 
     set altitudeDelta to shipPositionCheckRel:mag - ship:orbit:nextpatch:body:radius.
     //print altitudeDelta.
-    //print impactTimeStamp.
+    //print timeImpactEstimate.
 }
 // turn back time by 100 seconds and begin checking every 10 seconds
-set impactTimeStamp to impactTimeStamp - 100. 
-local shipPositionPatch is positionat(ship,impactTimeStamp).
-local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
-local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+set timeImpactEstimate to timeImpactEstimate - 100. 
+local positionShipPatch is positionat(ship,timeImpactEstimate).
+local positionTargetPatch is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
+local positionShipRelTargetPatch is positionTargetPatch - positionShipPatch.
 
-set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+set altitudeDelta to positionShipRelTargetPatch:mag - ship:orbit:nextpatch:body:radius.
 
 until (altitudeDelta) < 0 { // check until the altitude is negative
-    set impactTimeStamp to impactTimeStamp + 10.
+    set timeImpactEstimate to timeImpactEstimate + 10.
     
-    local shipPositionCheck is positionat(ship,impactTimeStamp).
-    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+    local shipPositionCheck is positionat(ship,timeImpactEstimate).
+    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
     local shipPositionCheckRel is targetPositionCheck - shipPositionCheck.
 
     set altitudeDelta to shipPositionCheckRel:mag - ship:orbit:nextpatch:body:radius.
     //print altitudeDelta.
-    //print impactTimeStamp.
+    //print timeImpactEstimate.
 }
 // turn back time by 10 seconds and begin checking every 1 second
-set impactTimeStamp to impactTimeStamp - 10. 
-local shipPositionPatch is positionat(ship,impactTimeStamp).
-local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
-local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+set timeImpactEstimate to timeImpactEstimate - 10. 
+local positionShipPatch is positionat(ship,timeImpactEstimate).
+local positionTargetPatch is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
+local positionShipRelTargetPatch is positionTargetPatch - positionShipPatch.
 
-set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+set altitudeDelta to positionShipRelTargetPatch:mag - ship:orbit:nextpatch:body:radius.
 until (altitudeDelta) < 0 { // check until the altitude is negative
-    set impactTimeStamp to impactTimeStamp + 1.
+    set timeImpactEstimate to timeImpactEstimate + 1.
 
-    local shipPositionCheck is positionat(ship,impactTimeStamp).
-    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
+    local shipPositionCheck is positionat(ship,timeImpactEstimate).
+    local targetPositionCheck is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
     local shipPositionCheckRel is targetPositionCheck - shipPositionCheck.
 
     set altitudeDelta to shipPositionCheckRel:mag - ship:orbit:nextpatch:body:radius.
     //print altitudeDelta.
-    //print impactTimeStamp.
+    //print timeImpactEstimate.
 }
 
-//set impactTimeStamp to impactTimeStamp - 1. // may need to recurse even further, this 1 second results in a ~4000m difference!
+//set timeImpactEstimate to timeImpactEstimate - 1. // may need to recurse even further, this 1 second results in a ~4000m difference!
 
-//local shipPositionPatch is positionat(ship,impactTimeStamp).
-//local targetPositionPatch is positionat(ship:orbit:nextpatch:body,impactTimeStamp).
-//local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+//local positionShipPatch is positionat(ship,timeImpactEstimate).
+//local positionTargetPatch is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).
+//local positionShipRelTargetPatch is positionTargetPatch - positionShipPatch.
 
-//set altitudeDelta to shipPositionPatchRel:mag - ship:orbit:nextpatch:body:radius.
+//set altitudeDelta to positionShipRelTargetPatch:mag - ship:orbit:nextpatch:body:radius.
 
 // recursion finished, positions at time of impact
-local targetPositionImpactEstimate is positionat(ship:orbit:nextpatch:body,impactTimeStamp).  // target body position
-local shipPositionImpactEstimate is positionat(ship,impactTimeStamp).                         // ship position
+local targetPositionImpactEstimate is positionat(ship:orbit:nextpatch:body,timeImpactEstimate).  // target body position
+local shipPositionImpactEstimate is positionat(ship,timeImpactEstimate).                         // ship position
 local shipPositionImpactEstimateRel is targetPositionImpactEstimate - shipPositionImpactEstimate.  //ship position realtive to taget body
 
 // calculate the spacecraft patch position at the estimated impact point, not sure if estimate use patch info or impact time info
@@ -81,7 +103,7 @@ local impactSiteEstimate is mun:geopositionof(shipPositionImpactEstimate).
 //local impactPositionPatch is positionat(impactSiteEstimatePrePatch:position,patchTime).
 
 // calculate impact target position
-//local targetPositionPatch is positionat(impactSite:position,patchTime).
+//local positionTargetPatch is positionat(impactSite:position,patchTime).
 
 
 local impactSite is waypoint("Site T3-P").
@@ -90,10 +112,10 @@ local impactSitePosition is impactSite:position. // this is likely returning a p
 
 // shady deltav calulation to burn correction, test here, move to inside patch (or leave here to test for large difference)
 // this burn will happen just past the patch
-local deltav is velocityat(ship,impactTimeStamp):orbit:mag * sin (vang(shipPositionImpactEstimate,impactSitePosition)).
+local deltav is velocityat(ship,timeImpactEstimate):orbit:mag * sin (vang(shipPositionImpactEstimate,impactSitePosition)).
 
 // calculate time until impact, this results in a timespan
-local impactETA is impactTimeStamp - timestamp(). // this results in a timespan
+local impactETA is timeImpactEstimate - timestamp(). // this results in a timespan
 
 clearscreen.
 print "ETA to impact (s)                     : " + impactETA:full.
@@ -107,23 +129,23 @@ print "Estimated impact position angle (deg) : " + vang(shipPositionImpactEstima
 
 // get impact geoposition, then get the patch position to it
 // get waypoint geoposition, then get ship patch position
-// local deltav is velocityat(ship,patchTime) * sin (vang(impactPositionPatch,targetPositionPatch))
+// local deltav is velocityat(ship,patchTime) * sin (vang(impactPositionPatch,positionTargetPatch))
 // use patch velocity of ship * sin of previous angle
 // us that as delta v for a radial burn just past patch point
 // do more research on vectors and orbits, this probably isn't correct
 
-//local shipPositionPatch is positionat(ship,patchTime).
-//local targetPositionPatch is positionat(ship:orbit:nextpatch:body,patchTime).
-//local shipPositionPatchRel is targetPositionPatch - shipPositionPatch.
+//local positionShipPatch is positionat(ship,patchTime).
+//local positionTargetPatch is positionat(ship:orbit:nextpatch:body,patchTime).
+//local positionShipRelTargetPatch is positionTargetPatch - positionShipPatch.
 
 // print position of impact as differnce to desired impact point
 // as meters to N/S and E/W
 
 //print "velocity relative to this body is: " + shipVelocityPatch:mag.
 //print "velocity relative to the Mun is:   " + shipVelocityPatchRel:mag.
-//print "Distance to Mun at patch point     " + shipPositionPatchRel:mag.
+//print "Distance to Mun at patch point     " + positionShipRelTargetPatch:mag.
 //print "Loose time to Mun                  " + timeToImpact.
-//print "Distance to Mun at guess point     " + shipPositionPatchRel:mag.
+//print "Distance to Mun at guess point     " + positionShipRelTargetPatch:mag.
 //print "Loose time to Mun                  " + timeToImpact.
 
 // calculate poistion of ship 60 seconds past SOI patch point
